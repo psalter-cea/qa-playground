@@ -1,0 +1,392 @@
+{
+	"info": {
+		"_postman_id": "ac2d8f43-6fe3-4736-8aff-2fbdd412eee6",
+		"name": "Psalter Activity",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33281629"
+	},
+	"item": [
+		{
+			"name": "gigya login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var response = JSON.parse(responseBody);\r",
+							"var token = response.token;\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.response.to.have.status(200);\r",
+							"   if(pm.response.code === 200){\r",
+							"       pm.test(\"Successfully login\");\r",
+							"       pm.environment.set(\"token\", token);\r",
+							"   }\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "{{email}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{URL}}/v1/services/gigya/login",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"v1",
+						"services",
+						"gigya",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get users resources",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//check first if token is not null or empty string\r",
+							"var token = pm.environment.get(\"token\");\r",
+							"\r",
+							"pm.test(\"Valid Token Value\", () => {\r",
+							"    pm.expect(token).not.to.be.empty.string;\r",
+							"    pm.expect(token).not.to.be.undefined;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/v1/resources/?page=1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"v1",
+						"resources",
+						""
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all active announcements",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const schema = {\r",
+							"\"type\": \"object\",\r",
+							"\"properties\": {\r",
+							"    \"id\": {\"type\" : \"integer\"},\r",
+							"    \"title\": {\"type\" : \"string\"},\r",
+							"    \"content\": {\"type\" : \"string\"},\r",
+							"    \"metadata\": {\"type\" : \"string\"},\r",
+							"    \"is_active\": {\"type\" : \"integer\"},\r",
+							"    \"is_default_active\": {\"type\" : \"integer\"},\r",
+							"    \"created_at\": {\"type\" : \"string\", \"format\" : \"date-time\"},\r",
+							"    \"updated_at\": {\"type\" : \"string\", \"format\" : \"date-time\"}\r",
+							"    },\r",
+							"\"required\": [\"id\", \"title\", \"content\", \"metadata\", \"is_active\", \"is_default_active\", \"created_at\", \"updated_at\"],\r",
+							"\"additionalProperties\": false\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Validate schema\", () => {\r",
+							"            pm.response.to.have.jsonSchema(schema);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/v1/announcements/",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"v1",
+						"announcements",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Return list of all books",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const schema = {\r",
+							"\"type\": \"object\",\r",
+							"\"properties\": {\r",
+							"    \"total\" : {\"type\" : \"integer\"},\r",
+							"    \"perPage\" : {\"type\" : \"integer\"},\r",
+							"    \"page\" : {\"type\" : \"integer\"},\r",
+							"    \"lastPage\" : {\"type\" : \"integer\"},\r",
+							"    \"data\" : {\r",
+							"        \"type\" : \"array\",\r",
+							"        \"minItems\": 1,\r",
+							"        \"maxItems\": 20,\r",
+							"        \"items\" : [{\r",
+							"            \"type\" : \"object\",\r",
+							"            \"properties\" : {\r",
+							"                \"id\" : {\"type\" : \"integer\"},\r",
+							"                \"series_id\" : {\"type\" : \"integer\"},\r",
+							"                \"title_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"edition_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"demo_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"trial_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"name\" : {\"type\" : \"string\"},\r",
+							"                \"isbn_13\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"isbn_10\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"pretty_url\" : {\"type\" : [\"string\", \"null\"]},\r",
+							"                \"thumbnail_path\" : {\"type\" : [\"string\", \"null\"]},\r",
+							"                \"is_enabled\" : {\"type\" : \"integer\"},\r",
+							"                \"published_at\" : {\"type\" : [\"string\", \"null\"], \"format\" : \"date-time\"},\r",
+							"                \"created_at\" : {\"type\" : \"string\", \"format\" : \"date-time\"},\r",
+							"                \"updated_at\" : {\"type\" : \"string\", \"format\" : \"date-time\"},\r",
+							"                \"thumbnail_url\" : {\"type\" : [\"string\", \"null\"]}\r",
+							"                },\r",
+							"            \"required\": [\"id\", \"title_id\", \"series_id\", \"edition_id\", \"demo_id\", \"trial_id\", \"name\", \"isbn_13\", \"isbn_10\", \"pretty_url\", \"thumbnail_path\", \"is_enabled\", \"published_at\", \"created_at\", \"updated_at\", \"thumbnail_url\"],\r",
+							"            \"additionalProperties\": false\r",
+							"            }]\r",
+							"        }\r",
+							"    },\r",
+							"\"required\": [\"total\", \"perPage\", \"page\", \"lastPage\", \"data\"],\r",
+							"\"additionalProperties\": false\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Validate schema\", () => {\r",
+							"            pm.response.to.have.jsonSchema(schema);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/v1/books/",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"v1",
+						"books",
+						""
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "3",
+							"disabled": true
+						},
+						{
+							"key": "keyword",
+							"value": "AQA",
+							"disabled": true
+						},
+						{
+							"key": "curriculum_id",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "is_trial",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "is_series_with_demo",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "is_enabled",
+							"value": "0",
+							"disabled": true
+						},
+						{
+							"key": "country_id",
+							"value": "13",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Return book via subject id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const schema = {\r",
+							"\"type\": \"object\",\r",
+							"\"properties\": {\r",
+							"    \"total\" : {\"type\" : \"integer\"},\r",
+							"    \"perPage\" : {\"type\" : \"integer\"},\r",
+							"    \"page\" : {\"type\" : \"integer\"},\r",
+							"    \"lastPage\" : {\"type\" : \"integer\"},\r",
+							"    \"data\" : {\r",
+							"        \"type\" : \"array\",\r",
+							"        \"minItems\": 1,\r",
+							"        \"maxItems\": 20,\r",
+							"        \"items\" : [{\r",
+							"            \"type\" : \"object\",\r",
+							"            \"properties\" : {\r",
+							"                \"id\" : {\"type\" : \"integer\"},\r",
+							"                \"series_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"title_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"edition_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"demo_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"trial_id\" : {\"type\" : [\"integer\", \"null\"]},\r",
+							"                \"name\" : {\"type\" : \"string\"},\r",
+							"                \"isbn_13\" : {\"type\" : [\"integer\", \"null\", \"string\"]},\r",
+							"                \"isbn_10\" : {\"type\" : [\"integer\", \"null\", \"string\"]},\r",
+							"                \"pretty_url\" : {\"type\" : [\"string\", \"null\"]},\r",
+							"                \"thumbnail_path\" : {\"type\" : [\"string\", \"null\"]},\r",
+							"                \"is_enabled\" : {\"type\" : \"integer\"},\r",
+							"                \"published_at\" : {\"type\" : [\"string\", \"null\"], \"format\" : \"date-time\"},\r",
+							"                \"created_at\" : {\"type\" : \"string\", \"format\" : \"date-time\"},\r",
+							"                \"updated_at\" : {\"type\" : \"string\", \"format\" : \"date-time\"},\r",
+							"                \"thumbnail_url\" : {\"type\" : [\"string\", \"null\"]}\r",
+							"                },\r",
+							"            \"required\": [\"id\", \"title_id\", \"series_id\", \"edition_id\", \"demo_id\", \"trial_id\", \"name\", \"isbn_13\", \"isbn_10\", \"pretty_url\", \"thumbnail_path\", \"is_enabled\", \"published_at\", \"created_at\", \"updated_at\", \"thumbnail_url\"],\r",
+							"            \"additionalProperties\": false\r",
+							"            }]\r",
+							"        }\r",
+							"    },\r",
+							"\"required\": [\"total\", \"perPage\", \"page\", \"lastPage\", \"data\"],\r",
+							"\"additionalProperties\": false\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Validate schema\", () => {\r",
+							"            pm.response.to.have.jsonSchema(schema);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/v1/books?subject_id=3",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"v1",
+						"books"
+					],
+					"query": [
+						{
+							"key": "subject_id",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

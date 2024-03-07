@@ -1,0 +1,80 @@
+name: PSALTER_ACTIVITY_QA
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Release name'     
+        required: true
+        default: 'Sprint 1'
+      tags:
+        description: 'Test run name'
+        required: true
+      runtype:
+        type: choice
+        description: 'Run type'
+        required: true
+        options: 
+        - test
+        - regression
+jobs:
+  global-go-api:
+    runs-on: ubuntu-latest
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+    # Install Node on the runner
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with: 
+          node-version: '16.x'
+    
+    # Install the newman command line utility and also install the html extra reporter
+      - name: Install newman
+        run: |
+          npm install -g newman
+      - name: Install html extra
+        run: |
+          npm install -g newman-reporter-htmlextra
+      # - name: Install qase reporter
+      #   run: |
+      #     npm install -g newman-reporter-qase
+          
+    # Make directory to upload the test results
+      - name: Make Directory for results
+        run: mkdir -p testResults
+        
+    # Run the POSTMAN collection
+      # - name: regression workflow
+      #   if: ${{ github.event.inputs.runtype == 'regression'}} 
+      #   run: newman run "./PostmanCollections/go-backend_cicd_qa.postman_collection.json" -e "go-backend_qa.postman_environment.json" 
+      #     -r cli,htmlextra,qase 
+      #     --reporter-htmlextra-export testResults/htmlreport.html 
+      #     --reporter-qase-logging 
+      #     --reporter-qase-projectCode APIGO 
+      #     --reporter-qase-apiToken ${{secrets.QASE_TOKEN}}
+      #     --reporter-qase-runName "${{github.event.inputs.logLevel}} - ${{github.event.inputs.tags}}"
+      #     --reporter-qase-rootSuiteTitle 'GO backend API regression'
+      #     --reporter-qase-runComplete
+          
+    # Run the POSTMAN collection
+      - name: test workflow
+        if: ${{ github.event.inputs.runtype == 'test'}} 
+        run: newman run "Psalter_QA_Activity.postman_collection.json" -e "Psalter_QA_Activity.postman_environment.json" 
+          -r cli,htmlextra 
+          --reporter-htmlextra-export testResults/htmlreport.html 
+        
+    # Upload the contents of Test Results directory to workspace
+      - name: Output the run details
+        if: always()
+        uses: actions/upload-artifact@v2
+        with: 
+          name: "Psalter_QA_Activity_Reports"
+          path: testResults
+
+
+      #- name: check run type
+      #  uses: marcdomain/set-variables@v1
+      #  with:
+      #    variables: |
+      #      PROJ: "${{ github.event.inputs.runtype }}" == "test" ? "PCG" : "APIGO"
