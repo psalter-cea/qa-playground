@@ -1,4 +1,4 @@
-name: PSALTER_ACTIVITY_QA
+name: PSALTER_ACTIVITY_QA_REPO_DISPATCH
 on:
   repository_dispatch:
     types: [custom_event_type]
