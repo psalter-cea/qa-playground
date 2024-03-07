@@ -17,7 +17,7 @@ on:
         - test
         - regression
 jobs:
-  global-go-api:
+  psalter=activity:
     runs-on: ubuntu-latest
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
