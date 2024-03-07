@@ -45,7 +45,6 @@ jobs:
           
     # Run the POSTMAN collection
       - name: test workflow
-        if: ${{ github.event.inputs.runtype == 'test'}} 
         run: newman run "Psalter_QA_Activity.postman_collection.json" -e "Psalter_QA_Activity.postman_environment.json" 
           -r cli,htmlextra 
           --reporter-htmlextra-export testResults/htmlreport.html 
