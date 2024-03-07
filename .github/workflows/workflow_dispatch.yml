@@ -1,4 +1,4 @@
-name: PSALTER_ACTIVITY_QA
+name: PSALTER_ACTIVITY_QA_WORKFLOW_DISPATCH
 on:
   workflow_dispatch:
     inputs:
